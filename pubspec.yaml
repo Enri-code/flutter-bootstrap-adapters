@@ -1,7 +1,7 @@
 name: adapters
-description: "A new Flutter package project."
+description: Infrastructure adapters providing concrete implementations for connectivity, DI, HTTP, logging, routing, storage, time services, and network queue management.
 publish_to: none
-version: 0.0.1
+version: 0.0.2
 
 environment:
   sdk: ^3.9.2
@@ -13,28 +13,27 @@ dependencies:
 
   bootstrap:
     git: https://github.com/Enri-code/flutter-bootstrap
-    
-  collection: ^1.19.1
+
+  # HTTP & Networking
   dio: ^5.9.0
   dio_smart_retry: ^7.0.1
   fresh_dio: ^0.4.4
+
+  # Routing & DI
   go_router: ^17.0.1
-  
   get_it: ^9.0.5
+
+  # Storage
   flutter_secure_storage: ^10.0.0
-  image_picker: ^1.2.1
-  sentry_flutter: ^9.8.0
   shared_preferences: ^2.5.3
 
+  # Monitoring & Logging
+  sentry_flutter: ^9.8.0
+
+  # Connectivity & Time
   connectivity_plus: ^7.0.0
-  path: ^1.9.1
-  path_provider: ^2.1.5
   ntp: ^2.0.0
   time_config_checker: ^0.0.15
-  
-  firebase_messaging: ^15.2.6
-  awesome_notifications: ^0.10.1
-  awesome_notifications_fcm: ^0.10.1
 
 dev_dependencies:
   flutter_test:

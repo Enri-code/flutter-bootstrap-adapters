@@ -5,7 +5,6 @@ export 'http/client/dio_factory.dart';
 export 'http/in_memory_token_store.dart';
 export 'http/secure_storage_token_store.dart';
 export 'http/interceptors/fresh_dio_utils.dart';
-export 'http/interceptors/log_out_interceptor.dart';
 export 'logger/logger.dart';
 export 'queue/manager/network_queue_manager_impl.dart';
 export 'queue/runner/queue_runner.dart';

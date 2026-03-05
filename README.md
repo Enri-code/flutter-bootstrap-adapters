@@ -1,66 +1,127 @@
 # Adapters
 
-Infrastructure adapters package that provides concrete implementations and re-exports reusable packages.
+Infrastructure adapters package providing concrete implementations of core interfaces for Flutter applications.
 
 ## Overview
 
-This package serves as a central hub for infrastructure concerns, providing:
-- Concrete implementations of core interfaces
-- Re-exports of reusable packages (auth_core, network_queue, push_notifications)
-- Platform-specific adapters
+This package provides production-ready implementations for common infrastructure concerns:
+- Network connectivity monitoring
+- Dependency injection (DI)
+- HTTP client with retry and token refresh
+- Logging (development and Sentry)
+- Routing with GoRouter
+- Storage (in-memory and persistent)
+- Time synchronization with NTP
+- Network queue management
 
-## Included Packages
+## Features
 
-### Re-exported Packages
+### Connectivity
+- Real-time network status monitoring
+- Support for WiFi, mobile, and ethernet connections
+- Broadcast stream for multiple listeners
 
-- **auth_core** - Token storage and authentication
-- **network_queue** - Offline-first network queue
-- **push_notifications** - Local and push notifications
+### Dependency Injection
+- GetIt-based DI container
+- Singleton and lazy singleton registration
+- Async dependency support
 
-### Adapters
+### HTTP Client
+- Dio-based HTTP client factory
+- Smart retry mechanism
+- OAuth token management with automatic refresh
+- Secure token storage (FlutterSecureStorage)
+- In-memory token storage for development
 
-- **Connectivity** - Network connectivity monitoring
-- **DI** - Dependency injection with get_it
-- **HTTP** - Dio HTTP client factory
-- **Logger** - Logging implementations (dev, Sentry)
-- **Router** - GoRouter factory
-- **Store** - In-memory and SharedPreferences storage
-- **Time** - NTP time service
+### Logging
+- Multi-logger support (dev + Sentry)
+- Performance tracking with Sentry transactions
+- Automatic Flutter error capture
+- Breadcrumb tracking
+
+### Router
+- GoRouter factory for modular routing
+- Support for navigation observers
+- Deep linking and restoration
+
+### Storage
+- Key-value primitive storage (SharedPreferences)
+- Object storage with JSON serialization
+- In-memory storage for testing/development
+
+### Time Service
+- NTP time synchronization
+- Automatic time configuration validation
+- Midnight detection for day-change events
+
+### Network Queue
+- Queue manager for offline-first operations
+- Automatic retry on connectivity restore
+- Task lifecycle management
 
 ## Usage
 
 ```dart
 import 'package:adapters/adapters.dart';
 
-// All adapters and re-exported packages available
+// Connectivity
+final connectivity = ConnectivityAdapter(Connectivity());
+final isOnline = connectivity.isConnected;
+
+// DI
+final di = GetItDI();
+di.registerSingleton<MyService>(MyService());
+
+// HTTP Client
+final dio = DioFactory.build(
+  baseUrl: 'https://api.example.com',
+  timeout: Duration(seconds: 30),
+);
+
+// Logging
+await appLogger.init();
+appLogger.info('Application started');
+
+// Storage
+final store = createKVPrimitiveStore();
+await store.set('key', 'value');
+
+// Time Service
+final timeService = NtpTimeService();
+final currentTime = await timeService.getTime();
 ```
 
 ## Structure
 
 ```
 lib/
-├── connectivity/          # Network connectivity
-├── di/                    # Dependency injection
-├── http/                  # HTTP client
-│   └── client/
-├── logger/                # Logging
-│   └── implementations/
-├── router/                # Routing
-├── store/                 # Storage
-├── time/                  # Time service
+├── connectivity/          # Network connectivity monitoring
+├── di/                    # Dependency injection (GetIt)
+├── http/                  # HTTP client and token management
+│   ├── client/           # Dio factory
+│   └── interceptors/     # Fresh Dio token refresh
+├── logger/                # Logging implementations
+│   └── implementations/  # Dev, Sentry, Performance
+├── queue/                 # Network queue management
+│   ├── manager/          # Queue manager
+│   └── runner/           # Queue runner
+├── router/                # GoRouter factory
+├── store/                 # Storage implementations
+├── time/                  # NTP time service
 └── adapters.dart          # Main export
 ```
 
 ## Dependencies
 
-- `core` - Core interfaces
-- `auth_core` - Authentication (re-exported)
-- `network_queue` - Queue system (re-exported)
-- `push_notifications` - Notifications (re-exported)
+- `bootstrap` - Core interfaces
 - `dio` - HTTP client
-- `get_it` - DI
+- `dio_smart_retry` - Retry logic
+- `fresh_dio` - Token refresh
+- `get_it` - Dependency injection
 - `go_router` - Routing
 - `sentry_flutter` - Error tracking
-- `shared_preferences` - Storage
-- `connectivity_plus` - Connectivity
-- `ntp` - Time sync
+- `shared_preferences` - Persistent storage
+- `flutter_secure_storage` - Secure token storage
+- `connectivity_plus` - Connectivity monitoring
+- `ntp` - Time synchronization
+- `time_config_checker` - Time configuration validation
