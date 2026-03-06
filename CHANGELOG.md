@@ -1,3 +1,9 @@
+## 0.0.3
+
+### Bug Fixes
+
+- Downgraded **connectivity_plus** to ^6.1.3
+
 ## 0.0.1
 
 ### Initial Release

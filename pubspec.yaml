@@ -1,7 +1,7 @@
 name: adapters
 description: Infrastructure adapters providing concrete implementations for connectivity, DI, HTTP, logging, routing, storage, time services, and network queue management.
 publish_to: none
-version: 0.0.2
+version: 0.0.3
 
 environment:
   sdk: ^3.9.2
@@ -12,7 +12,9 @@ dependencies:
     sdk: flutter
 
   bootstrap:
-    git: https://github.com/Enri-code/flutter-bootstrap
+    git: 
+      url: https://github.com/Enri-code/flutter-bootstrap
+      ref: v0.0.1
 
   # HTTP & Networking
   dio: ^5.9.0
