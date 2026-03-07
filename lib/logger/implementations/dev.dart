@@ -44,9 +44,11 @@ class DevLogger extends Logger {
           'context': details.context?.toDescription(),
         },
       );
+      FlutterError.onError?.call(details);
     };
     PlatformDispatcher.instance.onError = (error, stack) {
       exception(error, stack: stack);
+      PlatformDispatcher.instance.onError?.call(error, stack);
       return true;
     };
   }

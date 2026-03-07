@@ -111,20 +111,26 @@ class KVSharedPrefsObjectStore<ObjectType>
 }
 
 ObjectStore<ObjectType> createObjectStore<ObjectType>({
-  required KVSharedPrefsObjectStore<ObjectType> store,
+  required FromJson<ObjectType> fromJson,
+  required ToJson<ObjectType> toJson,
   String? key,
 }) {
   if (Platform.isAndroid && kDebugMode) {
     return InMemoryObjectStore<ObjectType>(key: key);
   }
-  return SharedPrefsObjectStore(store, key: key);
+  return SharedPrefsObjectStore(fromJson, toJson, key: key);
 }
 
 class SharedPrefsObjectStore<ObjectType> implements ObjectStore<ObjectType> {
-  SharedPrefsObjectStore(this._store, {String? key})
-    : _key = key ?? ObjectType.toString();
+  SharedPrefsObjectStore(
+    FromJson<ObjectType> fromJson,
+    ToJson<ObjectType> toJson, {
+    String? key,
+  }) : _key = key ?? ObjectType.toString(),
+       _store = KVSharedPrefsObjectStore<ObjectType>(fromJson, toJson);
 
   final String _key;
+
   final KVSharedPrefsObjectStore<ObjectType> _store;
 
   @override
