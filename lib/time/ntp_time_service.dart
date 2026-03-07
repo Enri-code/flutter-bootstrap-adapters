@@ -11,57 +11,47 @@ import 'package:time_config_checker/time_config_checker.dart';
 /// - Checks if system time is automatic, throws exception if not
 /// - Detects day changes in user's local timezone
 class NtpTimeService implements TimeService {
-  /// Controller for day change stream
-  final _midnightController = StreamController<void>.broadcast();
-
-  /// Timer for day change detection
-  Timer? _dayChangeTimer;
-
-  @override
-  Stream<void> get onMidnight => _midnightController.stream;
-
   @override
   Future<DateTime> getTime() async {
     if (await _isSystemTimeAutomatic()) return DateTime.now();
 
     try {
       return NTP.now(timeout: const Duration(seconds: 10));
-    } catch (e) {
+    } catch (_) {
       throw const SystemTimeNotAutomaticException();
     }
   }
 
   @override
-  /// Schedule next day change check
-  Future<void> trackMidnight() async {
-    final currentDay = await getTime();
+  Stream<void> trackTime(
+    int hour, {
+    int minute = 0,
+    int second = 0,
+    bool repeat = false,
+  }) async* {
+    final currentTime = await getTime();
+    final currentDay = DateUtils.dateOnly(currentTime);
 
-    final midnight = DateUtils.dateOnly(
-      currentDay,
-    ).add(const Duration(days: 1));
+    var time = currentDay.add(
+      Duration(hours: hour, minutes: minute, seconds: second),
+    );
 
-    final timeUntilMidnight = midnight.difference(currentDay);
+    if (time.isAfter(currentTime)) {
+      time = time.add(const Duration(days: 1));
+    }
 
-    _dayChangeTimer?.cancel();
-    _dayChangeTimer = Timer(timeUntilMidnight, _checkDayChange);
-  }
+    final duration = time.difference(currentTime);
 
-  /// Check if day has changed and emit event
-  Future<void> _checkDayChange() async {
-    _midnightController.add(null);
-    return trackMidnight();
+    await Future.delayed(duration);
+
+    yield null;
+
+    if (repeat) yield* Stream.periodic(Duration(hours: 24));
   }
 
   /// Check if system time is set to automatic.
   Future<bool> _isSystemTimeAutomatic() async {
     final config = await const TimeConfigChecker().getTimeConfig();
     return config.isAutomaticTime && config.isAutomaticTimeZone;
-  }
-
-  /// Dispose resources
-  @override
-  Future<void> dispose() async {
-    _dayChangeTimer?.cancel();
-    await _midnightController.close();
   }
 }

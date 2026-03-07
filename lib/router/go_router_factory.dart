@@ -1,3 +1,4 @@
+import 'package:bootstrap/core.dart';
 import 'package:bootstrap/extensions/iterable_extension.dart';
 import 'package:bootstrap/interfaces/modules/module/module.dart';
 import 'package:bootstrap/interfaces/modules/router/router_factory.dart';
@@ -7,12 +8,14 @@ import 'package:go_router/go_router.dart';
 
 class GoRouterFactory extends RouterFactory<RouteBase, GoRouter> {
   GoRouterFactory({
+    required this.injector,
     this.initialLocation,
     this.restorationScopeId,
     this.observers,
     this.redirect,
   });
 
+  final DI injector;
   final String? initialLocation;
   final String? restorationScopeId;
   final List<NavigatorObserver>? observers;
@@ -20,7 +23,7 @@ class GoRouterFactory extends RouterFactory<RouteBase, GoRouter> {
 
   @override
   GoRouter buildRouter(List<ModuleRoutes<RouteBase>> modules) {
-    final routes = modules.map((e) => e.routes).flatten().toList();
+    final routes = modules.map((e) => e.routes(injector)).flatten().toList();
 
     return GoRouter(
       initialLocation: initialLocation,
