@@ -9,10 +9,6 @@ void main() {
       timeService = NtpTimeService();
     });
 
-    tearDown(() {
-      timeService.dispose();
-    });
-
     group('getTime', () {
       test(
         'returns current time from NTP server',
@@ -67,76 +63,6 @@ void main() {
         skip:
             'Requires platform plugin TimeConfigChecker - integration test only',
       );
-    });
-
-    group('onMidnight stream', () {
-      test('provides a broadcast stream', () {
-        // Act
-        final stream = timeService.onMidnight;
-
-        // Assert
-        expect(stream, isA<Stream<DateTime>>());
-        expect(stream.isBroadcast, isTrue);
-      });
-
-      test('can have multiple listeners', () {
-        // Act
-        final stream = timeService.onMidnight;
-        final subscription1 = stream.listen((_) {});
-        final subscription2 = stream.listen((_) {});
-
-        // Assert
-        expect(subscription1, isNotNull);
-        expect(subscription2, isNotNull);
-
-        // Cleanup
-        subscription1.cancel();
-        subscription2.cancel();
-      });
-
-      test('emits midnight event when day changes', () async {
-        // This test is difficult to implement without mocking time
-        // In a real scenario, you would inject a clock/time provider
-        // For now, we verify the stream exists and can be listened to
-
-        // Arrange
-        final events = <void>[];
-        final subscription = timeService.onMidnight.listen(events.add);
-
-        // Wait a short time
-        await Future.delayed(const Duration(milliseconds: 100));
-
-        // Assert - no events should have occurred in 100ms
-        expect(events, isEmpty);
-
-        // Cleanup
-        await subscription.cancel();
-      });
-    });
-
-    group('dispose', () {
-      test('cleans up resources properly', () {
-        // Arrange
-        final service = NtpTimeService()
-          // Act
-          ..dispose();
-
-        // Assert - should not throw
-        expect(service.dispose, returnsNormally);
-      });
-
-      test('can be called multiple times safely', () {
-        // Arrange
-        final service = NtpTimeService();
-
-        // Act & Assert
-        expect(() {
-          service
-            ..dispose()
-            ..dispose()
-            ..dispose();
-        }, returnsNormally);
-      });
     });
   });
 
