@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bootstrap/core.dart';
+import 'package:flutter/foundation.dart';
 import 'implementations/dev.dart';
 import 'implementations/sentry.dart';
 import 'implementations/sentry_performance.dart';
@@ -18,7 +19,21 @@ class MultiLogger extends Logger {
 
   @override
   FutureOr<void> init() async {
-    await Future.wait(loggers.map((e) => Future.value(e.init())));
+    FlutterError.onError = (details) {
+      exception(
+        'flutter_error',
+        stack: details.stack,
+        extra: {
+          'exception': details.exceptionAsString(),
+          'library': details.library,
+          'context': details.context?.toDescription(),
+        },
+      );
+    };
+    PlatformDispatcher.instance.onError = (error, stack) {
+      exception(error, stack: stack);
+      return true;
+    };
   }
 
   // ---------- fan-out with stack preserved ----------

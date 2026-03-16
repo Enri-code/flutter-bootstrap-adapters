@@ -21,9 +21,10 @@ class SentryLogger extends Logger {
     await SentryFlutter.init((o) {
       o
         ..dsn = dsn
-        ..enableAppHangTracking = true
         ..environment = environment
         ..tracesSampleRate = analyticsEnabled ? 0.2 : 0.0
+        ..enableLogs = true
+        ..enableAppHangTracking = true
         ..enableAutoPerformanceTracing = true
         ..beforeSend = (event, hint) {
           return event
