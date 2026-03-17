@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:bootstrap/interfaces/http/oauth_token/models/oauth_token.dart';
 import 'package:bootstrap/interfaces/http/token_store.dart';
-import 'package:bootstrap/interfaces/store/primitive_store.dart';
-import '../store/in_memory_store.dart';
+import 'package:bootstrap/interfaces/store/store.dart';
+import 'package:adapters/store/in_memory_store.dart';
 
 class InMemoryTokenStore implements TokenStore {
   InMemoryTokenStore([ObjectStore<OAuthToken>? storage])
