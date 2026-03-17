@@ -6,7 +6,7 @@ import 'package:bootstrap/interfaces/store/store.dart';
 mixin KVPrimitiveStoreStreamMixin on KVPrimitiveStore {
   final _controllers = <String, StreamController<dynamic>>{};
 
-  Stream<V?> watch<V>(String key) {
+  Stream<V?> watch<V>(String key) async* {
     final controller = _controllers.putIfAbsent(key, () {
       return StreamController<dynamic>.broadcast(
         onCancel: () {
@@ -15,7 +15,8 @@ mixin KVPrimitiveStoreStreamMixin on KVPrimitiveStore {
         },
       );
     });
-    return controller.stream.cast<V?>();
+    yield await get<V>(key);
+    yield* controller.stream.cast<V?>();
   }
 
   @override
@@ -42,7 +43,7 @@ mixin KVPrimitiveStoreStreamMixin on KVPrimitiveStore {
 mixin KVObjectStoreStreamMixin<ObjectType> on KVObjectStore<ObjectType> {
   final _controllers = <String, StreamController<ObjectType?>>{};
 
-  Stream<ObjectType?> watch(String key) {
+  Stream<ObjectType?> watch(String key) async* {
     final controller = _controllers.putIfAbsent(key, () {
       return StreamController<ObjectType?>.broadcast(
         onCancel: () {
@@ -51,7 +52,8 @@ mixin KVObjectStoreStreamMixin<ObjectType> on KVObjectStore<ObjectType> {
         },
       );
     });
-    return controller.stream;
+    yield await get(key);
+    yield* controller.stream;
   }
 
   @override
@@ -78,14 +80,16 @@ mixin KVObjectStoreStreamMixin<ObjectType> on KVObjectStore<ObjectType> {
 mixin PrimitiveStoreStreamMixin<V> on PrimitiveStore<V> {
   StreamController<V?>? _controller;
 
-  Stream<V?> watch() {
+  Stream<V?> watch() async* {
     _controller ??= StreamController<V?>.broadcast(
       onCancel: () {
         _controller?.close();
         _controller = null;
       },
     );
-    return _controller!.stream;
+
+    yield await get();
+    yield* _controller!.stream;
   }
 
   @override
@@ -110,14 +114,16 @@ mixin PrimitiveStoreStreamMixin<V> on PrimitiveStore<V> {
 mixin ObjectStoreStreamMixin<ObjectType> on ObjectStore<ObjectType> {
   StreamController<ObjectType?>? _controller;
 
-  Stream<ObjectType?> watch() {
+  Stream<ObjectType?> watch() async* {
     _controller ??= StreamController<ObjectType?>.broadcast(
       onCancel: () {
         _controller?.close();
         _controller = null;
       },
     );
-    return _controller!.stream;
+
+    yield await get();
+    yield* _controller!.stream;
   }
 
   @override

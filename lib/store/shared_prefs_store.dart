@@ -86,7 +86,11 @@ StreamableObjectStore<ObjectType> createStreamableObjectStore<ObjectType>({
   if (kDebugMode && Platform.isAndroid) {
     return StreamableInMemoryObjectStore<ObjectType>(key: key);
   }
-  return StreamableSharedPrefsObjectStore<ObjectType>(fromJson, toJson, key: key);
+  return StreamableSharedPrefsObjectStore<ObjectType>(
+    fromJson,
+    toJson,
+    key: key,
+  );
 }
 
 /// --- Implementations ---
@@ -151,7 +155,8 @@ class SharedPrefsPrimitiveStore<V> extends PrimitiveStore<V> {
 }
 
 /// Streamable version of [SharedPrefsPrimitiveStore].
-class StreamableSharedPrefsPrimitiveStore<V> extends SharedPrefsPrimitiveStore<V>
+class StreamableSharedPrefsPrimitiveStore<V>
+    extends SharedPrefsPrimitiveStore<V>
     with PrimitiveStoreStreamMixin<V>
     implements StreamablePrimitiveStore<V> {
   StreamableSharedPrefsPrimitiveStore(super.key, [super.store]);
@@ -220,9 +225,5 @@ class StreamableSharedPrefsObjectStore<ObjectType>
     extends SharedPrefsObjectStore<ObjectType>
     with ObjectStoreStreamMixin<ObjectType>
     implements StreamableObjectStore<ObjectType> {
-  StreamableSharedPrefsObjectStore(
-    super.fromJson,
-    super.toJson, {
-    super.key,
-  });
+  StreamableSharedPrefsObjectStore(super.fromJson, super.toJson, {super.key});
 }
