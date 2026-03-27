@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:bootstrap/interfaces/logger/performance_logger.dart';
-import 'sentry.dart' as sentry_impl;
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 /// Sentry-based performance tracker.
@@ -24,8 +23,6 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 class SentryPerformanceLogger implements PerformanceLogger {
   const SentryPerformanceLogger();
 
-  static bool get _enabled => sentry_impl.SentryLogger.isEnabled;
-
   @override
   FutureOr<void> init() {
     // Nothing to initialize - uses SentryLogger's initialization
@@ -33,10 +30,6 @@ class SentryPerformanceLogger implements PerformanceLogger {
 
   @override
   PerformanceTimer start(String operationName) {
-    if (!_enabled) {
-      return _NoOpTimer();
-    }
-
     return _SentryTimer(operationName);
   }
 }
@@ -92,21 +85,6 @@ class _SentryTimer implements PerformanceTimer {
         ),
       ),
     );
-  }
-
-  @override
-  Duration get elapsed => _stopwatch.elapsed;
-}
-
-/// No-op timer when Sentry is disabled
-class _NoOpTimer implements PerformanceTimer {
-  _NoOpTimer() : _stopwatch = Stopwatch()..start();
-
-  final Stopwatch _stopwatch;
-
-  @override
-  void stop({bool failed = false, Map<String, dynamic>? extra}) {
-    _stopwatch.stop();
   }
 
   @override

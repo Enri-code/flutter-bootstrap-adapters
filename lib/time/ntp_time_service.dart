@@ -23,18 +23,13 @@ class NtpTimeService implements TimeService {
   }
 
   @override
-  Stream<void> trackTime(
-    Duration time, {
-    bool emitIfPastTime = false,
-    bool repeat = false,
-  }) async* {
+  Stream<void> trackTimeOfDay(Duration time, {bool repeat = false}) async* {
     final currentTime = await getTime();
     final currentDay = DateUtils.dateOnly(currentTime);
 
     var targetTime = currentDay.add(time);
 
     if (targetTime.isAfter(currentTime)) {
-      if (emitIfPastTime) yield null;
       targetTime = targetTime.add(const Duration(days: 1));
     }
 
