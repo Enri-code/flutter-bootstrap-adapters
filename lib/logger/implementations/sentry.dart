@@ -34,8 +34,17 @@ class SentryLogger extends Logger {
   void info(String msg, {Map<String, Object?>? extra}) =>
       _crumb(SentryLevel.info, msg, extra);
   @override
-  void warn(String msg, {Map<String, Object?>? extra}) =>
-      _crumb(SentryLevel.warning, msg, extra);
+  void warn(String msg, {Map<String, Object?>? extra}) {
+    unawaited(
+      Sentry.captureMessage(
+        msg,
+        level: SentryLevel.warning,
+        withScope: (s) {
+          if (extra != null) s.setExtras(extra);
+        },
+      ),
+    );
+  }
 
   @override
   void error(

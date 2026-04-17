@@ -32,6 +32,20 @@ class SentryPerformanceLogger implements PerformanceLogger {
   PerformanceTimer start(String operationName) {
     return _SentryTimer(operationName);
   }
+
+  @override
+  void trackMetric(String name, num value, {Map<String, dynamic>? extra}) {
+    unawaited(
+      Sentry.addBreadcrumb(
+        Breadcrumb(
+          message: 'Metric recorded: $name',
+          category: 'performance.metric',
+          level: SentryLevel.info,
+          data: {'metric': name, 'value': value, if (extra != null) ...extra},
+        ),
+      ),
+    );
+  }
 }
 
 /// Timer that tracks operation duration using Sentry transactions.
@@ -85,6 +99,41 @@ class _SentryTimer implements PerformanceTimer {
         ),
       ),
     );
+  }
+
+  @override
+  void setMeasurement(String name, num value, {String? unit}) {
+    _transaction.setMeasurement(name, value, unit: _mapUnit(unit));
+  }
+
+  SentryMeasurementUnit? _mapUnit(String? unit) {
+    if (unit == null) return null;
+    final normalized = unit.toLowerCase();
+    if (normalized.contains('ms') || normalized.contains('milli')) {
+      return DurationSentryMeasurementUnit.milliSecond;
+    }
+    if (normalized.contains('ns') || normalized.contains('nano')) {
+      return DurationSentryMeasurementUnit.nanoSecond;
+    }
+    if (normalized == 's' || normalized.contains('second')) {
+      return DurationSentryMeasurementUnit.second;
+    }
+    if (normalized.contains('byte')) {
+      if (normalized.startsWith('k')) {
+        return InformationSentryMeasurementUnit.kiloByte;
+      }
+      if (normalized.startsWith('m')) {
+        return InformationSentryMeasurementUnit.megaByte;
+      }
+      if (normalized.startsWith('g')) {
+        return InformationSentryMeasurementUnit.gigaByte;
+      }
+      return InformationSentryMeasurementUnit.byte;
+    }
+    if (normalized.contains('percent') || normalized.contains('fraction')) {
+      return FractionSentryMeasurementUnit.percent;
+    }
+    return SentryMeasurementUnit.none;
   }
 
   @override
